@@ -1,0 +1,243 @@
+---
+title: "Untitled"
+author: "Sanghoon Kim"
+date: "7/17/2020"
+output: html_document
+---
+
+Hi all, this is Sanghoon again and welcome to "Playing with Data II: Data Visualization". Data analysis is one of the integral parts of graduate school and political science in general, and using effective and relevant visualization skills will facilitate your research and make your research more accessible to other scholars and general public. For example, Florence Nightingale is known as the founder of modern nursing, but her bigger contribution is from her work as a statistician, with her famous diagram about the causes of mortality during the Crimean War (see https://en.wikipedia.org/wiki/Florence_Nightingale#/media/File:Nightingale-mortality.jpg). The importance of data visualization is much larger today, with the flood of data accessible to data scientists and especially with the develpment of machine learning techniques. Or visit the New York Times website, and the first thing you may see, especially recently, is the map of COVID-19 cases around the US and the world. 
+
+These all might seem to serious to some of you, if you are new to data science or R coding, but my goal today is to help you feel comfortable with data visualization and find it not too difficult at all. To do so, I divided this session into three parts: 1) basic data visualization (descrptive statistics); 2) visualizing regression results; and 3) data visualization with real-world data. I designed these three parts in the order of difficulty and if you feel more confident with the basic visualization, you may feel free to skip to later sections. In part 1, I will use a basic dataset in R, `iris', and work with you to try different visualization tools. In part 2, I will use the same dataset, but this time with the regression analysis. In addition to using regression tables, we will talk about how to plot coefficients in fancy ways, especially useful for conference presentations. In the last part, I will use the COVID-19 case count dataset from the New York Times, and try copying some of the maps they post on their online/offline pages. This section will include both how to plot complicated data effectively and how to make them look pretty.  
+
+I have designed this .Rmd file in the way that you can read through my descriptions and try the example R codes as you go. I also included some practice examples with some missing codes to help you have some hands-on experiences. I will not post answers about how to solve these practices. If you have any questions about them, please come visit me during the designated office hours. This introduction got longer than I expected--sorry about that. Let's move on to the first part. 
+
+
+1. Basic data visualization 
+1.1. Getting to know your data
+
+When conducting your research, you will use all different kinds of data: survey data from the American National Election Studies, world bank data about GDP growth and poverty rates, or your own data collected through the PS Subject Pool. Whichever data you use, the first thing you need to do is to see what the dataset looks like. Basically, you want to know the mean or standard deviation of some key variables, how many people participated in the survey, the distribution of some variables, etc. Let's first start with some basic commands for these:
+
+```{r}
+# I will write R code descriptions after a # sign. Just read them as you read some hashtags on Instagram. 
+# Let's first see the entire dataset we are using today, `iris'. 
+
+View(iris)
+# this code will open a new window with a spreadsheet showing the dataset. You see five columns and 150 rows. 
+
+colnames(iris) # will show the names of columns. This is useful when you have hundres of columns in your dataset.
+str(iris) # the structure of the dataset, useful when you want to know the type (`numeric', `factor', `character') of each variable.
+
+```
+
+Easy, right? Or, we can use some R packages to know the dataset better. For example, `stargazer' is a good tool to show descriptive statistics and also regression tables (please run `install.packages(stargazer)' before running the following code, if you don't have it already.)
+```{r}
+stargazer::stargazer(iris, type="text")
+```
+
+
+1.2. Basic graphs
+
+Now, let's do some real "visualizations". First, I want to know the relationship between two variables in the dataset, `Sepal.Length' and `Sepal.Width'.
+```{r}
+with(iris,plot(Sepal.Length~Sepal.Width)) # This will create a scatterplot on the lower-right panel of R studio. We can make the same graph in a different way:
+plot(x=iris$Sepal.Width, y=iris$Sepal.Length) # You can specify your x and y in `plot()' command. 
+```
+
+Or, you can use `ggplot', which you will use a lot in your Quant classes and your research. Basically, ggplot is smarter and prettier:
+```{r}
+library(ggplot2)
+ggplot(iris, aes(y=Sepal.Length,x=Sepal.Width)) + geom_point() # basic plot of the two variables
+
+ggplot(iris, aes(y=Sepal.Length,x=Sepal.Width)) + geom_point() + theme_bw() # and make it prettier
+```
+
+I will add a bunch of more codes to the previous ones. Can you tell which one is making which changes? 
+```{r}
+ggplot(iris, aes(y=Sepal.Length,x=Sepal.Width)) + geom_point(size=3, shape=2) + theme_classic()
+
+# and one more
+ggplot(iris, aes(y=Sepal.Length,x=Sepal.Width, color=Species)) + geom_point() + 
+    theme_bw()
+```
+
+We can also make box plots with ggplot, with the `geom_boxplot()' command:
+```{r}
+gbox <- ggplot(iris, aes(Species,Sepal.Length)) + geom_boxplot(varwidth=T, fill="plum") + theme_bw()
+gbox
+# Box plot shows the distributions of each variable with a simple box shape, with the bold line in the middle showing the mean. 
+# You can also change lables of plots:
+gbox + labs(x="I am Species", y="I am Sepal Length", title="Iris")
+
+```
+
+Practice #1
+We used Sepal.Length and Sepal.Width in the previous examples. Now, make a scatter plot and a box plot with `Petal.Length' and `Petal.Width' variables. Please chance the codes below to make them run correctly.
+```{r}
+ggplot(nameofthedata, aes(variable1, variable2)) + geom_point(shape=choose_a_number) + theme_whateverthemeyoulike()
+
+ggplot(nameofthedata, aes(variable1, variable2)) + geom_boxplot(varwidth=T, fill="what is your favorite color?") + theme_whateverthemeyoulike()
+
+```
+
+
+1.3. Distributions
+I'm sure you have covered this part in a different Math Camp session. So I will make it short. 
+```{r}
+# I want to know the distribution of some variables:
+
+ggplot(iris,aes(Sepal.Width)) + geom_density() + theme_bw() # distribution of Sepal.Width.
+
+ggplot(iris,aes(Sepal.Width)) + geom_density(aes(fill=Species),alpha=0.7) + theme_bw() # and the same variable by species
+
+ggplot(iris,aes(Sepal.Width)) + geom_density(aes(fill=Species),alpha=0.7) + theme_bw() +
+  scale_fill_brewer(palette = "Set1") # why not make it prettier? Also try, "Dark2", "Pastel2" for fun.
+
+```
+
+2. Visualizing regression results 
+2.1. Plotting the main relationship of interest
+
+Now, do you feel more comfortable with your data? At least a little bit, I guess? The next step is using running some regressions and showing the results graphically. First, we need to run a regression. I will just follow the previous example and use Petal.Width and Petal.Length.
+
+```{r}
+fit <- lm(Petal.Width~Petal.Length, data=iris)
+```
+
+Well, technically, we should have a hypothesis before running any regression analyses. So, let's just say, we believe the length of a petal may explain the width of a petal. We want to know if there is any significant relationship between the two variables:
+```{r}
+summary(fit) # The summary() command shows the regression results nicely, and most of the time, people focus on the `stars' and see if the relationship is statistically significant or not. Based on the results, there is a sigfniciant relationship between  the two variables. 
+
+stargazer::stargazer(fit, type="text") # this one is a fancier version, which resembles what you see in academic articles. We gaze at stars, ergo `stargzer'. 
+```
+Here the coefficient is 0.416, meaning there is a positive relationship between the two variables. Let's see it on a graph.
+
+```{r}
+ggplot(iris, aes(y= Petal.Width, x= Petal.Length)) + geom_point(shape=1) + theme_bw() # We do see that the dots are aligned beautifully on a straight line, but we don't have a line yet. Let's add it.
+
+ggplot(iris, aes(y= Petal.Width, x= Petal.Length)) + geom_point(shape=1) + theme_bw() +
+  geom_smooth(method="lm", formula=y~x) # this is basically the graph that you will use a lot in your final paper: data points and a regression line. I will add another way to draw the same graph below. 
+
+ggplot(iris, aes(y= Petal.Width, x= Petal.Length)) + geom_point(shape=1) + theme_bw() +
+  geom_abline(slope = fit$coefficients[2], intercept = fit$coefficients[1] , color="red") # Why do we use slope and intercept here? (Just a review question from your regression session, haha.)
+
+```
+
+Practice #2. 
+Let's draw the same graphs with Sepal.Width and Sepal.Length. 
+```{r}
+ggplot(iris, aes(y= Some.Width, x= Some.Length)) + geom_point(shape=1) + theme_bw() +
+  geom_smooth(method="what does lm stand for?", formula=y*x) # formula? 
+
+```
+
+2.2. Coefficient plots 
+You can also show regression results by using coefficient plots, which is more intuitive and easier to interpret. We will use another package here to draw coefficient plots. We use the `plot_model' command here. We will add other vairables in a new regression model to make it more visual. 
+```{r}
+library(ggplot2) # putting it here just in case
+library(sjPlot)
+
+fit2 <- lm(Petal.Width~Petal.Length+Sepal.Length+Sepal.Width, data=iris)
+
+plot_model(fit2,vline.color = "darkred") + theme_bw()
+```
+This graph summarizes three coefficients nicely: we can see that all three variables are distinguishable from zero, with their standard devision lines not touching the vertical zero line. And we can see that the direction of effect is different only with the `Sepal.Length' variable. 
+
+Practice #3
+There are many build-in datasets in R. Let's use another dataset and create a coefficient plot.
+```{r}
+colnames(mpg)
+str(mpg)
+
+# first create a regression model of your choice (just put in any variable names in each place): 
+fit3 <- lm(cty ~ Your_IV1 + Your_IV2 + Your_IV3, data=mpg)
+
+# Now, create a coefficient plot!
+plot_model(fit3,vline.color = "gray80") + theme_bw()
+```
+
+
+3. COVID19 dataset
+There is no need to stress how horrible the last six, seven months went, especially with you all as prospective students. We've seen piles of news articles and graphs showing how horrible the situation is everyday, and I was thinking that having a hands-on experience with the actual data might help you with learning data visualization better. We start with loading the dataset that I downloaded from the New York Times. *Make sure to place the .csv file in the same folder as this .Rmd file.* 
+
+```{r}
+covid19dat <- read.csv("us-counties.csv", header=T) # loading the data 
+colnames(covid19dat) 
+```
+So, the observations in this dataset is recorded each day ("date"), by each county ("county") and state ("state"). FIPS code is a unique code assigned for each county. The main COVID-19 variables are the number of "cases" and "deaths". Here, I am interested in learning how the covid cases have changes over time in Champaign county. 
+
+3.0. Distribution of the dataset
+```{r}
+covid19cu <- subset(covid19dat, fips=="17019") # Creating a smaller dataset only with Champaign county data.
+
+# Show daily case changes in Champaign 
+ggplot(covid19cu, aes(x=date,y=cases)) + 
+  geom_bar(stat="identity",fill="darkgreen") + theme_bw()
+
+ggplot(covid19cu, aes(x=date)) + 
+  geom_point(aes(y=cases)) + theme_bw() # basically the same as the bar plot 
+
+# Plotting daily case counts
+covid19cu$daily <- c(NA,diff(covid19cu$cases,differences = 1)) # no need to worry about this, just creating a lagged variable
+
+ggplot(covid19cu, aes(x=date,y=daily)) + geom_bar(stat="identity",fill="darkgreen") + theme_bw() # daily count changes
+```
+
+
+Finally, we will plot total case counts on a US map. You can plot the cases at the county level and at the state level, but the latter requires further data transformation. We are using `plot_usmap()' function here, which automatically creates a US map when the dataset has geographical information. Please see the codes below. 
+
+3.1. County-level maps
+```{r}
+covid19small <- subset(covid19dat, date=="2020-07-16") # total case count dataset on July 16.
+
+library(usmap) # package for the plot_usmap() function
+library(ggplot2)
+plot_usmap(data=covid19small, values="cases", regions = "county") + 
+  theme(panel.background = element_rect(colour = "gray")) 
+
+# well, it's not actually easy to compare across counties. Let's change colors. 
+
+plot_usmap(data=covid19small, values="cases", regions = "county") + 
+  theme(panel.background = element_rect(colour = "gray")) + 
+  scale_fill_gradient(low="white", high="red") # a little better? You can also zoom into smaller regions.
+
+# You can add more colors to the gradation scale.  
+plot_usmap(data=covid19small, values="cases", regions = "county") + 
+  theme(panel.background = element_rect(colour = "gray")) + scale_fill_gradientn(colors=c("ivory","yellow","orange","red")) # better? prettier? At least it is better to identify those 'hot spots' on the map. 
+
+# or you can zoom in by designating specific regions
+plot_usmap(data=covid19small, values="cases", regions = "county", include=c(.northeast_region)) + # try .north_central_region, .midwest_region, south_region, .west_region 
+  theme(panel.background = element_rect(colour = "gray")) + 
+  scale_fill_gradientn(colors=c("ivory","yellow","orange","red")) 
+
+# You can also specify by states.
+plot_usmap(data=covid19small, values="cases", regions = "county", include=c("CA", "OR")) + # California, Oregon
+  theme(panel.background = element_rect(colour = "gray")) + 
+  scale_fill_gradientn(colors=c("ivory","yellow","orange","red")) 
+ 
+```
+
+3.2. State-level maps
+Now, move on to the state-level analysis
+```{r}
+# First, create a state-average dataset
+covid19state <- aggregate(x = covid19small$cases,                # Specify data column
+          by = list(covid19small$state),              # Specify group indicator
+          FUN = mean)
+
+colnames(covid19state) <- c("state", "cases") # renaming the datset
+
+plot_usmap(data=covid19state, values="cases", regions = "state") + 
+  theme(panel.background = element_rect(colour = "gray")) +
+  scale_fill_gradientn(colors=c("ivory","yellow","orange","red")) # Why Arizona...
+
+```
+
+# Wrap-up
+In this section, we focused on visualizing data using R, especially showing the distribution of the dataset, showing regression results, and drawing geographical distributions on a map. I selected certain codes and functions that I personally use a lot when I do my own research, so I hope they can be useful to you all in the future. This Rmarkdown document only includes the basic steps of visualization. I recommend visiting the following websites if you wish to learn further about more advanced skills.
+
+References: 
+- Top 50 ggplot2: http://r-statistics.co/Top50-Ggplot2-Visualizations-MasterList-R-Code.html 
+- Color customization in ggplot2: http://www.sthda.com/english/wiki/ggplot2-colors-how-to-change-colors-automatically-and-manually
+- US map: https://cran.r-project.org/web/packages/usmap/vignettes/mapping.html 
+
+

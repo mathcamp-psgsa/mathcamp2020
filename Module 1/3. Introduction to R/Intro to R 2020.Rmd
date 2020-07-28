@@ -1,0 +1,157 @@
+---
+title: "Intro to R"
+author: "Kristin Bail"
+date: "July 14, 2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Intro to R
+
+###Setting the working directory
+
+What does this mean? The working directory is the location on your computer that R will use to pull data from. You need to tell R where it should be "looking" when you tell it to load data. Many people have a different folder on their computer for each paper, project, or class, and then make the appropriate folder their working directory as needed.
+
+There are three primary ways to set your working directory. The first involves using the navigation bar at the top of RStudio, selecting "Session," "Set Working Directory," and "Choose Directory." The second utilizes the "Set as Working Directory" option available in the "More/Gear" pulldown menu in the files/packages/plots menu. The third, and most reliable, method is to use the setwd() command, followed by the file pathway of the desired working directory.
+
+For example:
+
+```{r}
+setwd("C:/Users/KBail/Desktop/MathCamp")
+```
+
+###What is R? Basically, R is giant calculator
+
+We can use R to perform basic or advanced computation.
+
+```{r}
+# here is some basic computation (clearly...)
+2 + 3
+```
+
+##Creating Items and Variables
+
+Let's say that your life would be simplified by the creation of a numeric placeholder. To create or assign values to an item or variable, simply use:  <- 
+
+You can also use = to do this, if you like. Many people prefer using <- because it differentiates "assignment" from an actual calculation.
+
+```{r}
+w <- 74  #assigns the value 74 to the object w
+w #prints the value of object w
+y <- 23
+w-y
+z <- (1:5) #Assigns a vector of numbers 1-5 to the item, z
+z
+```
+
+##Functions in R
+
+So now we know R is a calculator. You can do anything with it that you might with a usual calculator, step by step. A function is a collection of commands that together constitute a single, more complex mathematical task. 
+
+```{r}
+# For example, mean is a function in R
+mean(z)
+# We could calculate the mean step by step...
+sum <- sum(z)
+sum
+length <- length(z) #length helps us find how many numbers/observations are in an object
+length
+mean <- sum/length
+mean
+# Or, we could write our own function that contains the steps of calculating a mean
+MC_mean <- function(x){sum(x)/length(x)}
+# Now we can use our function MC_mean to find a mean of any value "x"
+MC_mean(z)
+# Let's use our function with another list of numbers to try it out
+list <- (1:20)
+MC_mean(list)
+```
+
+To reiterate, a function is a command that tells R to execute a number of commands/calculations to achieve one more complex task. You can use the function lm(), for example, to run a basic least squares linear regression (OLS). That one function, lm, contains within it many lines of code. When you use the function, you are telling R to run all of those lines of code/all of those calculations, and just give you the end result. Using functions ends up saving you a lot of time! Hooray for efficiency! 
+
+## Packages
+
+You can imagine that any statistical or mathematical function can be completed using R. Of course, you can also imagine how complex these functions can become. This is where packages come in!
+
+A package is a collection of functions and data that meet a specific need or fulfill a necessary purpose. They're useful tools that can add to your R capabilities. For example, if you want to run a time series analysis, you can find a package that some person (or persons) spent a lot of time perfecting - once you download that package, you can use the functions in it to do specific complex things in R. 
+
+```{r}
+# You only need to install packages ONCE, but you need to load them EVERY TIME you use R
+#install.packages("name_here")
+# Here's how you'd install the package called MASS
+install.packages("MASS") #notice the quotation marks
+# Loading the package
+library(MASS) #no quotation marks
+##What's inside a package? The ls() command shows you the full contents of a package, whether functions or data.
+ls("package:MASS")
+```
+
+After running the ls() command, we see the MASS package contains something called "Melanoma." Let's figure out what that is.
+
+### Playing with data
+
+Here are some ways to find out more about the items that come with the MASS package we just loaded. 
+
+```{r}
+# help links to documentation about the thing you're interested in
+help(Melanoma)
+```
+
+The help command tells us "Melanoma" is a data frame with data on 205 patients in Denmark with malignant melanoma. 
+
+```{r}
+# View opens the dataset in a new tab for you to look at
+View(Melanoma)
+# look at the first 6 rows of the data
+head(Melanoma)
+# what variables/column names are in the data
+names(Melanoma)
+# how many columns are in the data
+length(Melanoma)
+# what are the dimensions of the data, rows and columns
+dim(Melanoma)
+```
+
+Knowing the dimensions of our data is essential for accurate analysis, so we're off to a great start! But wait, there's more...
+
+```{r}
+# If you want information about only one variable...
+# To designate a pathway to one variable, use the $
+# For example, Melanoma$variablename
+Melanoma$sex
+# looking at the distribution of a variable/column
+table(Melanoma$sex)
+#isolating the mean of a single column
+mean(Melanoma$time)
+```
+
+## Using your own data!
+
+Eventually you'll need to download your own data. Three ways to do that closely mirror the ways we set our working directories. 
+
+Method number one, use the navigation bar. Select File, Import Dataset, then select the data type and click the "Browse" button. Method two requires locating the data set in the files/plots/packages window. Under the "Files" tab, click the file you want to upload and select the "Import Dataset" option. If the file you want isn't immediately visible, look for and click the three dots (...) to the right of the "Home" icon. This method is handy because R generates code that you can copy and paste into your document for when you want to use it later. 
+
+Method three involves some code.
+
+```{r, echo=FALSE, include=TRUE}
+library(readr) #loads the read_csv function, which reads CSV files. YOu can use other extensions for other file types.
+read_csv("C:/Users/KBail/Desktop/MathCamp/minwage_final_project.csv")
+# Give your data a new name and save it into your environment
+minwage <- read_csv("C:/Users/KBail/Desktop/MathCamp/minwage_final_project.csv")
+head(minwage)
+```
+### Finding help with R
+
+You can access R documentation using the ? command.
+
+```{r}
+?mean
+?lm
+```
+
+Otherwise, Google and/or ask for help! Everyone is uses Google all the time for this stuff, so don't be shy.  StackOverflow and StackExchange are often great options, with a lot of other graduate students asking questions about how to work with R.
+
+Good luck with R! Remember, Google is your friend!
