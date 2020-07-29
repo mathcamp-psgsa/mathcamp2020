@@ -1,0 +1,16 @@
+ANES Data,ANES Short,ANES Codebook Pdf Page
+V160001,CaseID,50
+V161002,Sex,67
+V161005,Did_Vote_2012,70
+V161006,Who_Votefor_2012,71
+V161010d,State,78
+V161011,RegtoVote,81
+V161019,PartyReg,95
+V161021,Did_Vote_2016_Primary,97
+V161021a,Who_Votefor_2016_Primary,98
+V161030,DoesIntedtoVote,116
+V161031,Who_Inted_Votefor_2016,117
+V162012,SymbolsOfSupport,799
+V162014,ContribMoney,801
+V162034,Did_Vote_2016_Presi,850
+V162034a,Who_Votefor_2016,851
