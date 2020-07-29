@@ -1,0 +1,91 @@
+---
+title: "Data Manipulation and Basic R"
+author: "Jinwon Lee"
+date: '2020 7 17 '
+output:
+  html_document:
+    df_print: paged
+---
+
+###This material would be helpful to understand basic r: https://r4ds.had.co.nz 
+
+#Packages 
+Let's learn packages what usually used for data manipulation and wrangling. Here they are:
+```{r,  warning= FALSE}
+library(dplyr)
+library(tidyverse)
+library(haven)
+library(readxl)
+library(broom)
+
+```
+
+In turn:
+
+
+*tidyverse*  includes:
+1) ggplot2, which implements the Grammar of Graphics.
+
+2) dplyr: One important contribution of the dplyr package is that it provides a “grammar” (in particular, verbs) for data manipulation and for operating on data frames. 
+
+3) tidyr, which is a nice set of helper functions with an eye toward “tidy data:” a state of affairs where (1) every row in a data object is an observation; (2) every column in that data object is a variable; and (3) every cell in the data object is a single value.
+
+These are major verbs of the tidyr : 
+
+• select: return a subset of the columns of a data frame, using a flexible notation
+• filter: extract a subset of rows from a data frame based on logical conditions
+• arrange: reorder rows of a data frame
+• rename: rename variables in a data frame
+• mutate: add new variables/columns or transform existing variables
+• summarise / summarize: generate summary statistics of different variables in the data frame,
+possibly within strata
+• %>%: the “pipe” operator is used to connect multiple verb actions together into a pipeline
+
+4) readr is a good set of functions for reading in your data.
+
+*haven* and *readxl* are both part of the tidyverse, too, but they are not automatically loaded. These help with reading in Stata, SAS, SPSS, and Excel data.
+
+*broom* is a tidyverse-compliant way to handle the output of statistical models.
+
+ 
+
+```{r}
+
+print(table1)
+
+data.frame(table1)
+
+table1
+
+# summarize(table1)
+
+# learn functions : 1) filter
+
+# see data collected in the year of 1999
+filter(table1, year==1999) 
+
+# see only 'China' data
+filter(table1, country=='China')
+
+
+#select? : see only country and year column 
+
+select(table1, country, year)
+
+# change the name of columm: rename
+
+#e.g: rename(table1, numcases = cases)
+
+#mutate
+
+new_table1 <-mutate(table1, case_ratio = population/cases)
+
+new_table1
+
+```
+
+### Download any dataset what you're interested in, and read that file by using different pakages (such as read.csv or readxl, etc).Then, try to manipulate data with what you've learned here. 
+
+
+
+
