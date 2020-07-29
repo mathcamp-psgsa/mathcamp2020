@@ -1,0 +1,465 @@
+---
+title: "Integration"
+author: "Miles D. Williams"
+subtitle: "UIUC Math Camp 2020"
+output: pdf_document
+fontsize: 12pt
+fontfamily: mathpazo
+header-includes:
+  - \usepackage{setspace}
+  - \onehalfspacing
+---
+
+```{r setup, include=FALSE}
+# set document options
+knitr::opts_chunk$set(echo = F,
+                      message = F,
+                      warning = F,
+                      fig.height = 2.5,
+                      fig.width = 3.75,
+                      dev = 'cairo_pdf')
+# libraries
+library(tidyverse)
+library(ggridges)
+
+extrafont::loadfonts(dev='win',quiet=T)
+```
+
+Some useful resources:
+
+ - See this [\color{blue}great series on integrals](https://www.mathsisfun.com/calculus/integration-introduction.html) by the site *Math is Fun*. I generally go to this site any time I have a question about calculus, linear or matrix algebra, etc. It's an accessible resource that's not overly jargon-y.
+ - Did you know that you don't have to do calculus by hand? [\color{blue}Wolfram Alpha](https://www.wolframalpha.com/) is going to be your *new best friend*.
+
+## What is an integral?
+
+In this session we will cover *integration*. Integration is a useful tool for a host of reasons, and as a political scientist, you'll find yourself reading more than a few peer reviewed journal articles that use integration---perhaps in analyzing a formal mathematical model of citizen, political leader, or state behavior---and you even may apply integration in your own research. And I should add that integration is *integral* (ha! a pun!) to probability theory. Without the ability to integrate functions, we wouldn't have things like [\color{blue}cumulative probability functions](https://en.wikipedia.org/wiki/Cumulative_distribution_function#Definition) to summarize the cumulative probability of an event over a range of values of some random variable.
+
+But perhaps a more common application of integration that you may have encountered prior to now is in *finding the area under the curve* of some function.
+
+Consider, for example, a quadratic function $f: x \to y$. Say we would like to know the area under this function's curve. 
+
+One strategy to find the area would be to sum over the areas of individual rectangular "slices" under the curve along $x$:
+
+```{r}
+tibble(
+  x = 0:10,
+  y = 2 + 2*x - 0.15*x^2
+) %>%
+  ggplot() +
+  aes(
+    x = x,
+    y = y
+  ) +
+  geom_col() + 
+  geom_smooth(se=F,col='black') +
+  labs(
+    x = 'x',
+    y = 'f(x)'
+  ) +
+  scale_x_continuous(
+    breaks = 0:10
+  ) +
+  scale_y_continuous(
+    breaks = 0:8
+  ) +
+  theme_ridges(font_family = 'Palatino Linotype') +
+  theme(
+    axis.title = element_text(face = 'italic'),
+    axis.title.y = element_text(angle = 360,vjust=1)
+  ) +
+  geom_errorbar(
+    aes(
+      x = 6,
+      ymin = 0.25,
+      ymax = 8.5
+    )
+  ) +
+  geom_point(
+    aes(
+      x = 6,
+      y = 4
+    ),
+    col = 'grey35',
+    size = 6
+  ) + 
+  annotate(
+    'text',
+    x = 6, y = 4,
+    label = 'Delta * x',
+    parse = T,
+    family = 'Palatino Linotype',
+    fontface = 'italic',
+    color = 'white'
+  )
+```
+
+We define the area of a given slice as $\Delta x = 1 \times f(x)$ where 1 is the width of a given slice, and where $f(x)$ is the value of the function at a given value along $x$. 
+
+In this particular example, denote the set of values along $x$ that we're going to use as $x'$ where $x' = \{0,1,2,...,9,10 \} \in \mathbb{Z}^{0+}$ (that is, $x'$ is a vector of non-negative integers ranging from 0 to 10). 
+
+Further denote $\Delta x_i'$ as the area of a given slice indexed by $i = 1,2,...,|x'|$ where $\Delta x_i' = f(x_i')$ and where $|x'|$ tells us the number of elements or values of $x'_i$ in the vector $x'$. 
+
+Since in this example a slice has width of 1, $\Delta x_i'$ is simply equal to the value of $f(x_i')$. We thus now have the vector $\Delta x' = \{\Delta x'_1, \Delta x_2',...,\Delta x'_{|x'|} \}$, where for each element of the vector $\Delta x_i' = f(x_i')$. We can then approximate the area under the curve as
+$$\text{Area} \approx \sum_{i = 1}^{|\Delta x'|} \Delta x'_i.$$
+
+Though this approach is simple enough, it has one glaring weakness: *it won't give us exactly the right answer for the area under the curve.* We could try to use narrower or more finely grained slices to get an answer closer to the truth, but these again would fail to tell us the true area under the curve.
+
+It's only as $\Delta x \to 0$ that the answer gets closer to the truth. Integration is a convenient and elegant way to identify what this correct answer is at the limit as $\Delta x$ becomes infinitesimally small.
+
+## Another definition for integration: It's the reverse of a derivative
+
+You might also know of another convenient definition of integration: *it is simply the reverse of finding the derivative of a function*. 
+
+Say we have the function 
+$$f(x) = x^2.$$
+Using the *power rule*, we know that the derivative of this function is
+$$\frac{df(x)}{dx} = 2x.$$
+Suppose that we then define the function $h(x) = df(x)/dx$. What would be the integral of $h(x)$?
+
+It turns out that the integral of $h(x)$ is $x^2 + C$. This is just our original function, plus $C$. 
+
+The $C$, here, represents the "constant of integration." This is just a placeholder for any potential constant (including zero, as was the case with our original function). We include this because the derivative $df(x)/dx = 2x$ in principal could be the derivative for any number of possible functions:
+$$
+\begin{aligned}
+f(x) & = x^2? \\
+f(x) & = x^2 + 1?\\
+f(x) & = x^2 - 999?
+\end{aligned}
+$$
+Using $C$ just helps to keep us honest about the fact that any time we integrate a function, said function could include any addition by $C \in \mathbb{R}$ as well.
+
+## Some more intuition
+
+Just like how derivatives tell us something about a particular function---the first derivative tells us the slope of a function at a given point, for example---the integral of a function also provides useful information.
+
+For example, say that the function $k(t) = -2t$ tells us the rate at which private investment in a mid-sized paper supply firm in northeast Pennsylvania yields returns on investment (ROI) at week $t$ after the initial investment. The integral of $k(t)$, in turn, will tell us about the cumulative ROI at month $t$:
+$$\overbrace{-2t}^{\text{ROI rate at }t}_{\color{red}{\text{Derivative}}} \longleftrightarrow \underbrace{C - t^2}_{\text{Total ROI at }t}^{{\color{blue}{\text{Integral}}}}$$
+
+Plotting these out below, we see on the left the rate of change in ROI communicated by $k(t)$, while on the right we see the cumulative ROI at a given $t$. In this example, I assume $C = 100$, denoting an initial investment of 100 dollars.
+
+```{r,fig.width=5}
+tibble(
+  t = rep(
+    seq(0,10,len=100),
+    len=200
+  ),
+  kt = c(
+    -2*t[1:100],
+    100 - t[101:200]^2
+  ),
+  value = c(
+    rep(
+      c('Change in ROI ($)',
+        'Cumulative ROI ($)'),
+      each = 100
+    )
+  )
+) %>%
+  ggplot() +
+  aes(t,kt) +
+  facet_wrap(~value,ncol=2,strip.position = 'left') +
+  geom_line(size = 1) +
+  scale_x_continuous(breaks=seq(0,10,by=2)) +
+  geom_vline(xintercept=0) +
+  geom_hline(yintercept=0) +
+  labs(
+    x = 't weeks from initial investment',
+    y = '',
+    title = 'Derivatives, Integrals, and ROI'
+  ) +
+  theme_ridges(font_family = 'Palatino Linotype') +
+  theme(
+    strip.background = element_blank(),
+    strip.placement = 'outside',
+    axis.title.x = element_text(face='italic')
+  )
+```
+
+While $k(t)$ tells us how quickly ROI changes at a given point in time, its integral tells us cumulatively how much money we'll have made by a given point in time---or in this case, *how much money we'd use*.
+
+## Notation
+
+Just like how derivatives have a special notation, so do integrals. For instance, we represent the derivative of a function by writing
+$$\frac{df(x)}{dx}.$$
+Similarly, when we want to represent the integral of a function, we write
+$$\int f(x) dx.$$
+
+The above notation has some interesting features, so let's break them down really quickly:
+$$\overbrace{\int}^\text{integral symbol} \underbrace{f(x)}_\text{the function to integrate} \overbrace{dx}^\text{slices over x}.$$
+Think of the $\int$ symbol like a fancy version of $\sum$, which is used to denote the *sum* over some set of values---like in our example with taking the sum over $\Delta x'_i$. But, while $\sum$ is used when there is a *finite* set of values to take the sum of, $\int$ is used when there is an *infinite* set of values. 
+
+The notation $dx$ signifies that as we're integrating, we're taking the sum over an infinite set of values. While $\Delta x$ denotes a slice with width greater than zero, $dx$ means that the slices are approaching zero in width.
+
+Finally, the function to be integrated, $f(x)$, is sandwiched between the integral symbol and the notation for slices over $x$.
+
+Note that you could also use $g(x)$ or $g(y)$, or any other notation for representing a function and its inputs. $\int g(z)dz$ is just as appropriate as $\int f(x) dx$---just make sure that you're consistent!
+
+## Definite and indefinite integrals
+
+When we use the integral symbol, we will sometimes use $\int_a^b$. Using this notation clarifies that we're dealing with a *definite* integral, as opposed to an *indefinite* integral. Just like the notation $\sum_{i=1}^n$ clarifies that we are summing over some finite set of values starting with the first value up to value $n$, $\int_a^b$ clarifies that we're interested in getting the area under a curve for values $a < x \leq b$.
+
+```{r}
+tibble(
+  x = seq(2,8,0.01),
+  y = sqrt(x)
+) %>%
+  ggplot() +
+  aes(
+      x = x,
+      y = y,
+      ymin = 0,
+      ymax = y
+    ) +
+  geom_ribbon(
+    alpha = .5
+  ) +
+  geom_line(
+    aes(
+      x = 2,
+      y = seq(0,sqrt(2),len=length(y))
+    ),
+    lty = 2
+  ) +
+  geom_line(
+    aes(
+      x = 8,
+      y = seq(0,sqrt(8),len=length(y))
+    ),
+    lty = 2
+  ) + 
+  geom_line(
+    aes(
+      x = seq(0,10,len=length(x)),
+      y = sqrt(seq(0,10,len=length(y)))
+    ),
+    size = 1
+  ) +
+  scale_x_continuous(
+    breaks = c(2,8),
+    labels = c('a','b')
+  ) +
+  labs(
+    y = 'f(x)',
+    title = 'Definite integrals'
+  ) +
+  theme_ridges(font_family = 'Palatino Linotype') +
+  theme(
+    axis.title = element_text(face = 'italic'),
+    axis.title.y = element_text(angle = 360,vjust=1)
+  ) +
+  annotate(
+    'text',
+    x = mean(c(2,8)),
+    y = .75,
+    label = 'Area from a to b',
+    fontface = 'italic',
+    family = 'Palatino Linotype'
+  )
+```
+
+
+When we use definite integrals to find the area under a defined range of values for a curve, it's helpful to know that we can ignore the constant of integration ($C$). This is because when we use $\int_a^b$, what we mean is that we want to take the integral of some function where $x = b$, and then subtract the integral of the function where $x = a$. When we do this, the $C$s will cancel out. Let me show you what I mean.
+
+Say we have $g(x) = 2x^3$ and we want the definite integral from 2 to 7. We know that the indefinite integral of this function is
+$$\int g(x) dx = \frac{x^4}{2} + C.$$
+Meanwhile, the definite integral is given as
+$$\int_2^7 g(x) dx = \left( \frac{7^4}{2} + C\right) - \left( \frac{2^4}{2} + C \right),$$
+which simplifies to
+$$\frac{7^4}{2} - \frac{2^4}{2}.$$
+Notice that the $C$s cancel out. This leaves us with the following *definite* answer for the area under the curve of $g(x)$ from $2 < x \leq 7$:
+$$\int_2^7 g(x) dx = 1,192.5.$$
+
+To be a little more general, let $h(x) + C$ denote the indefinite integral of $g(x)$. The definite integral is then given as
+$$\int_a^b g(x) dx = h(b) - h(a).$$
+
+Another way that we can write the definite integral is with square brackets like so
+$$\int_a^bg(x)dx = \left[ h(x) \right]_a^b.$$
+Inside the square brackets we have the indefinite integral without $C$, and along the right square bracket we subscript the starting value ($a$) and superscript the end value ($b$).
+
+## Finding the area of a rectangle
+
+Some of the above is pretty abstract, so let's apply integration to a really simple problem: *finding the area of a rectangle.*
+
+Consider the below $2 \times 3$ rectangle:
+
+```{r}
+ggplot() +
+  aes(
+    x = c(0,0,3,3),
+    y = c(0,2,2,0)
+  ) +
+  #geom_line(col='grey') +
+  geom_ribbon(
+    aes(
+      ymin = 0,
+      ymax = 2
+    ),
+    alpha = .5
+  ) +
+  labs(
+    x = 'x',
+    y = 'y',
+    title = 'A simple rectangle'
+  ) +
+  scale_x_continuous(breaks=0:3) +
+  scale_y_continuous(breaks=0:2) +
+  theme_ridges(font_family = 'Palatino Linotype') +
+  theme(
+    axis.title = element_text(face='italic'),
+    axis.title.y = element_text(angle = 360,
+                                vjust=1)
+  )
+```
+
+If we wanted to find the area of this rectangle, we could take a number of approaches. 
+
+One straightforward strategy would be to just add up the number of $1 \times 1$ squares or pieces that make up the rectangle. There are six of these squares in total, so that means the area of the rectangle is six---simple enough.
+
+We also could multiply the rectangle's length and width. The length (or height) is 2, and the width is 3. $2 \times 3 = 6$, so, again, we know the area is six.
+
+However, we can also use integration to find the rectangle's area. Say we treated the top-most edge of the rectangle as the line of a function that maps values of $x$ to $y$. Such a function for the top line of the rectangle would look like this:
+$$f(x) = y = 2.$$
+Plotting out this function gets us the following figure:
+
+```{r}
+ggplot() +
+  aes(
+    x = c(0,0,3,3),
+    y = c(0,2,2,0)
+  ) +
+  #geom_line(col='grey') +
+  geom_ribbon(
+    aes(
+      ymin = 0,
+      ymax = 2
+    ),
+    alpha = .5
+  ) +
+  geom_line(
+    aes(x = 0:3,y = 2),
+    size = 1
+  ) +
+  labs(
+    x = 'x',
+    y = 'y',
+    title = 'A simple rectangle'
+  ) +
+  scale_x_continuous(breaks=0:3) +
+  scale_y_continuous(breaks=0:2) +
+  theme_ridges(font_family = 'Palatino Linotype') +
+  theme(
+    axis.title = element_text(face='italic'),
+    axis.title.y = element_text(angle = 360,
+                                vjust=1)
+  ) +
+  annotate(
+    'text',
+    x = 1.5,
+    y = 2.17,
+    label = 'f(x) = 2',
+    fontface = 'italic',
+    family = 'Palatino Linotype'
+  ) +
+  annotate(
+    'text',
+    x = 1.5,
+    y = 1,
+    label = 'Area under f(x)',
+    fontface = 'italic',
+    family = 'Palatino Linotype'
+  )
+```
+
+To find the area of this rectangle (the area under the curve of $f(x)$), we can just take the definite integral of $f(x)$.
+
+Since 2 is a constant, that means the integral must be $2x + C$ (we know this because the derivative of $2x + C$ is $2$):
+$$\int f(x) dx = \int 2 dx = 2x + C.$$
+When then have the following definite integral
+$$\int_0^3 2 dx = \left[2x \right]_0^3 = 2\cdot3 - 2\cdot 0,$$
+which has the solution
+$$\int_0^32dx = 6.$$
+*This is same answer as before!*
+
+## A More Complicated Example
+
+For a problem like finding the area of a rectangle, or the area under a line with slope $=0$, using integration seems a little excessive. 
+
+However, integration is especially useful when we're dealing with irregularly shaped functions (or at least shapes with curves instead of sharp corners and all straight lines\footnote{I had a calculus teacher who hated the phrase "straight line."}).
+
+Consider the quadratic equation used in the intro for this document. The curve for this function, recall, looks like this:
+
+```{r}
+tibble(
+  x = seq(0,10,0.01),
+  y = 2 + 2*x - 0.15*x^2
+) %>%
+  ggplot() +
+  aes(
+    x = x,
+    y = y,
+    ymin = 0,
+    ymax = y
+  ) + 
+  geom_line(size = 1) +
+  geom_ribbon(alpha = .5) +
+  labs(
+    y = 'f(x)'
+  ) +
+  scale_x_continuous(
+    breaks = 0:10
+  ) +
+  scale_y_continuous(
+    breaks = 0:8
+  ) +
+  theme_ridges(font_family = 'Palatino Linotype') +
+  theme(
+    axis.title = element_text(face = 'italic'),
+    axis.title.y = element_text(angle = 360,vjust=1)
+  ) + 
+  annotate(
+    'text',
+    x = 1,
+    y = 5.8,
+    label = "curve%->%''",
+    parse = T,
+    family = 'Palatino Linotype'
+  ) + 
+  annotate(
+    'text',
+    x = 5.5,
+    y = 3.5,
+    label = 'Area under the curve',
+    family = 'Palatino Linotype'
+  )
+```
+
+The particular function that gives rise to this figure is given as
+$$f(x) = 2 + 2x - \frac{3}{20} x^2.$$
+
+Say we want to know the area under $f(x)$ from $x = 0$ to $x = 10$. We first find the integral of $f(x)$:
+$$\int f(x)dx =  2x + x^2 - \frac{1}{20}x^3 + C.$$
+The definite integral then is given as
+$$\int_0^{10} f(x) dx = \left[ 2x + x^2 - \frac{1}{20}x^3 \right]_0^{10} =  20 + 100 - 50 = 70.$$
+The area under the curve is 70!
+
+How does this solution compare to the addition of slices approach highlighted at the beginning of this document?
+
+Recall that we defined $\Delta x'$ as a vector of areas for particular slices under the curve of $f(x)$ along $x$. $x'$ was a vector of non-negative integers ranging from 0 to 10, and $\Delta x'_i = f(x'_i)$ is the area for the $i^\text{th}$ slice.
+
+Using this approach, the area under the curve is approximated as
+$$\text{Area} \approx \sum_{i = 1}^{|\Delta x'|} \Delta x'_i = \sum_{i = 1}^{|x'|} 2 + 2x_i' - \frac{3 x_i'^2}{20}.$$
+I won't make you suffer through the process of calculating each $\Delta x_i'$ and then summing them up. Instead, I'll just tell you that the answer is $74.25$. This solution is *relatively* close to the correct answer, which is $70$. 
+
+But still, using this approach we're overestimating the true area under the curve by $4.25$---that's not ideal. 
+
+This approach is also considerably more computationally intensive---would you rather calculate 11 different values of $\Delta x'$ and then add all these up, or would you prefer to calculate just two values and subtract one from the other? The solution with integration not only provides the correct answer, it's also just more elegant. 
+
+*That makes integration incredibly appealing*---hopefully you can see that now, too.
+
+## When you *can't* integrate
+
+Before we wrap things up, I hasten to point out one important caveat about integrals: the function to be integrated must be a *continuous* function. There *cannot* be any kind of break, or jump, or vertical asymptote.
+
+## Problem Sets
+
+Now it's your turn to play around with integrals. You can find the problem sets for this lesson [\color{blue}here](https://github.com/milesdwilliams15/Math-Camp-2020/blob/master/integrals-problems.pdf). 

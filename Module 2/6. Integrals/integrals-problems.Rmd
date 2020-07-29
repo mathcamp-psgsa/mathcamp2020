@@ -1,0 +1,74 @@
+---
+title: "Integration"
+subtitle: "Problem Set"
+author: "Miles D. Williams"
+output: pdf_document
+fontsize: 12pt
+fontfamily: mathpazo
+header-includes:
+  - \usepackage{setspace}
+  - \onehalfspacing
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F)
+```
+
+Below are problems related to integrals. You may either work out your responses in Latex or R Markdown and submit a rendered pdf, or you may write out your answers in a word doc that you save as a pdf, or you can write out your scanned answers. Send your answers to milesdw2@illinois.edu.
+
+### Problem 1. The area under *and over* the curve?
+
+Recall the example of the mid-sized paper supply company in northeast Pennsylvania. Say you've invested $\$50$ in this company and want to know how much money you've netted by week 15. The function describing the rate of ROI at week $t$, remember, is given as
+$$k(t) = -2t.$$
+The indefinite integral is 
+$$\int k(t)dt = C - t^2.$$
+
+**Part (A)**
+
+What will be your net ROI between when you invested and week 15?
+
+**Part (B)**
+
+Hint for **Part (A)**: your answer should have been *negative*. What does a negative value returned by the definite integral of $k(t)$ imply? Are we calculating the area *below* the curve of $k(t)$, or *above*? 
+
+
+### Problem 2. A unique fact about circles.
+
+If you've taken a class on geometry, you're probably familiar with the equation for the circumference of a circle:
+$$C = \pi d = 2\pi r,$$
+where $\pi$ is, well, the value of pi (3.14....), and where $d$ is the diameter of the circle and $r$ the circumference.
+
+Use integration to find the area of a circle with $r = 5$.
+
+*Hint*: imagine that $r$ varies from 0 at the origin of the circle to $r = 5$.
+
+### Problem 3. Practice with Integrals
+
+In today's age of Google where information is readily at our fingertips, rote memorization is pretty pointless. *But*, the ability to leverage tools to solve complex problems is incredibly valuable.
+
+With that in mind, below are some functions that I want you to integrate---but not by hand...
+
+Instead, use [\color{blue}Wolfram Alpha](https://www.wolframalpha.com/) to get the indefinite integrals for these functions.
+
+Here's an example of how it works. Say you have the function 
+$$q(x) = \frac{1}{x}.$$
+When you follow the link to Wolfram Alpha above, go to the search bar at the top of the page that says *Enter what you want to calculate or know about*.
+
+To get the integral of $q(x)$, all we need to do is write in the search bar `integrate 1/x`, then hit enter. 
+
+Some software will do all the work for you behind the scenes and return the integral of the function along with some plots.
+
+For the above function, it should return the following indefinite integral:
+$$\int \frac{1}{x} dx = \ln(x) + C.$$
+*Try it yourself to see.*
+
+Using this tool, find the integrals for the following functions:\footnote{\textit{Note:} To indicate that you want to multiply a variable by a constant, either write 'x*6', for example, or 'x 6' with a space. Otherwise, Wolfram's language will think you're specifying a function (e.g., 'x4' = $x(4)$).}
+
+1. $x^4$,
+2. $\ln(w)$,
+3. $e^y$,
+4. $10^v$,
+5. $1/(x^2 + 2x)$,
+6. $\sqrt{3 + 2x}$.
+
+
